@@ -1,6 +1,7 @@
 import path from "node:path";
 import { readdir, stat } from "node:fs/promises";
 import { RoutingTable } from "../types.js";
+import { pathToFileURL } from "node:url";
 
 async function traverseDir(dir: string): Promise<string[]> {
 	const files = await readdir(dir);
@@ -37,7 +38,7 @@ async function buildRoutingTable(dir: string) {
 
 	for (const filePath of routeFiles) {
 		let normalPath = filePath.replace(dir, "");
-		const esModule = await import(path.resolve(dir) + normalPath);
+		const esModule = await import(pathToFileURL(dir + normalPath).toString());
 
 		normalPath = normalPath.replace(".js", "").replace("index", "");
 		if (normalPath !== "/" && normalPath.endsWith("/"))
