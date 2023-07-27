@@ -1,0 +1,53 @@
+{
+	"name": "glacier.js",
+	"version": "0.1.0",
+	"homepage": "https://github.com/serhankileci/glacier.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/serhankileci/glacier.js.git"
+	},
+	"author": "Serhan Kileci <serhanselimkileci@gmail.com>",
+	"keywords": [
+		"node.js",
+		"typescript",
+		"web framework"
+	],
+	"description": "Opinionated web framework for Node.js, written in TypeScript.",
+	"main": "./build/index.js",
+	"license": "MIT",
+	"type": "module",
+	"files": [
+		"build",
+		"src"
+	],
+	"types": "./build/index.d.ts",
+	"bin": {
+		"glacier.js": "./build/util/cli.js"
+	},
+	"bugs": {
+		"url": "https://github.com/serhankileci/glacier.js/issues"
+	},
+	"directories": {
+		"doc": "docs"
+	},
+	"scripts": {
+		"lint": "eslint . --ext .js,.ts",
+		"format": "prettier --check './src/**/*.ts' || prettier --write './src/**/*.ts'",
+		"test": "jest",
+		"build": "yarn lint; yarn format; tsc -p ."
+	},
+	"dependencies": {
+		"utility-types": "^3.10.0"
+	},
+	"devDependencies": {
+		"@types/node": "^18.13.0",
+		"jest": "^29.5.0",
+		"@types/jest": "^29.5.2",
+		"@typescript-eslint/eslint-plugin": "^5.51.0",
+		"@typescript-eslint/parser": "^5.51.0",
+		"typescript": "^5.0.4",
+		"ts-node": "^10.9.1",
+		"eslint": "^8.33.0",
+		"prettier": "^2.8.4"
+	}
+}
