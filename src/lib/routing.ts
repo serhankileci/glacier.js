@@ -37,12 +37,15 @@ async function buildRoutingTable(dir: string) {
 	const routeFiles = await traverseDir(dir);
 
 	for (const filePath of routeFiles) {
-		let normalPath = filePath.replace(dir, "");
-		const esModule = await import(pathToFileURL(dir + normalPath).toString());
+		let normalPath = path.normalize(filePath.replace(dir, "")).replaceAll("\\", "/");
+
+		const esModule = await import(pathToFileURL(normalPath).toString());
 
 		normalPath = normalPath.replace(".js", "").replace("index", "");
 		if (normalPath !== "/" && normalPath.endsWith("/"))
 			normalPath = normalPath.slice(0, normalPath.length - 1);
+
+		normalPath = normalPath.replace(dir, "");
 
 		if (!esModule.main) throw "Expected a 'main' HTTP handler function.";
 
