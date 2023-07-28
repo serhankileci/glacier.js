@@ -34,20 +34,20 @@
 		"lint": "eslint . --ext .js,.ts",
 		"format": "prettier --check './src/**/*.ts' || prettier --write './src/**/*.ts'",
 		"test": "jest",
-		"build": "yarn lint; yarn format; tsc -p ."
+		"build": "npm run lint; npm run format; tsc -p ."
 	},
 	"dependencies": {
 		"utility-types": "^3.10.0"
 	},
 	"devDependencies": {
-		"@types/node": "^18.13.0",
-		"jest": "^29.5.0",
 		"@types/jest": "^29.5.2",
+		"@types/node": "^18.13.0",
 		"@typescript-eslint/eslint-plugin": "^5.51.0",
 		"@typescript-eslint/parser": "^5.51.0",
-		"typescript": "^5.0.4",
-		"ts-node": "^10.9.1",
 		"eslint": "^8.33.0",
-		"prettier": "^2.8.4"
+		"jest": "^29.5.0",
+		"prettier": "^2.8.4",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.0.4"
 	}
 }
