@@ -43,7 +43,7 @@ const Glacier: Glacier = async options => {
 					.map(path => "/" + path)
 			);
 
-			const { before, main, after } = routingTable[url.pathname];
+			const { before, main, after } = routingTable[url.pathname] || {};
 
 			for (let i = 0; i < separatedPaths.length; i++) {
 				const prev = routingTable[separatedPaths[i]];
