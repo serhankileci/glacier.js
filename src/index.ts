@@ -45,21 +45,26 @@ const Glacier: Glacier = async options => {
 
 			const { before, main, after } = routingTable[url.pathname] || {};
 
-			for (let i = 0; i < separatedPaths.length; i++) {
-				const prev = routingTable[separatedPaths[i]];
+			for (const path of separatedPaths) {
+				const prev = routingTable[path];
 
-				if (prev?.before) await prev?.before(req, res);
+				if (prev?.before) {
+					await prev?.before(req, res);
+				}
 			}
 
 			if (before) await before(req, res);
 			await main(req, res);
 			if (after) await after(req, res);
 
-			for (let i = 0; i < separatedPaths.length; i++) {
-				const prev = routingTable[separatedPaths[i]];
+			for (const path of separatedPaths) {
+				const prev = routingTable[path];
 
-				if (prev?.after) await prev?.after(req, res);
+				if (prev?.after) {
+					await prev?.after(req, res);
+				}
 			}
+
 		} catch (err: unknown) {
 			httpRes.end(err?.toString());
 		}
