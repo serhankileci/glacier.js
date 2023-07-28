@@ -64,7 +64,6 @@ const Glacier: Glacier = async options => {
 					await prev?.after(req, res);
 				}
 			}
-
 		} catch (err: unknown) {
 			httpRes.end(JSON.stringify(err?.toString()));
 		}
