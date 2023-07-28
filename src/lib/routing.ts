@@ -2,6 +2,8 @@ import path from "node:path";
 import { readdir, stat } from "node:fs/promises";
 import { RoutingTable } from "../types.js";
 import { pathToFileURL } from "node:url";
+const { platform } = process;
+const locale = path[platform === "win32" ? "win32" : "posix"];
 
 async function traverseDir(dir: string): Promise<string[]> {
 	const files = await readdir(dir);
@@ -37,30 +39,33 @@ async function buildRoutingTable(dir: string) {
 	const routeFiles = await traverseDir(dir);
 
 	for (const filePath of routeFiles) {
-		let normalPath = path.normalize(filePath.replace(dir, "")).replaceAll("\\", "/");
+		let localePath = filePath.split(path.sep).join(locale.sep);
+		const esModule = await import(pathToFileURL(localePath).toString());
 
-		const esModule = await import(pathToFileURL(normalPath).toString());
+		localePath = localePath
+			.replace(".js", "")
+			.replace("index", "")
+			.replaceAll("\\", "/")
+			.replace(dir, "");
 
-		normalPath = normalPath.replace(".js", "").replace("index", "");
-		if (normalPath !== "/" && normalPath.endsWith("/"))
-			normalPath = normalPath.slice(0, normalPath.length - 1);
-
-		normalPath = normalPath.replace(dir, "");
+		if (localePath !== "/" && localePath.endsWith("/")) {
+			localePath = localePath.slice(0, localePath.length - 1);
+		}
 
 		if (!esModule.main) throw "Expected a 'main' HTTP handler function.";
 
-		if (!table[normalPath]) {
-			table[normalPath] = {} as RoutingTable[number];
+		if (!table[localePath]) {
+			table[localePath] = {} as RoutingTable[number];
 		}
 
 		if (esModule.before) {
-			table[normalPath].before = esModule.before;
+			table[localePath].before = esModule.before;
 		}
 
-		table[normalPath].main = esModule.main;
+		table[localePath].main = esModule.main;
 
 		if (esModule.after) {
-			table[normalPath].after = esModule.after;
+			table[localePath].after = esModule.after;
 		}
 	}
 
