@@ -7,7 +7,7 @@ const Glacier: Glacier = async options => {
 
 	const { port, routesDir } = options;
 
-	console.log("❄️	Building routes...");
+	console.log("❄️	Building static routes...");
 	const routingTable = await buildRoutingTable(routesDir);
 
 	http.createServer(async (httpReq, httpRes) => {
@@ -36,25 +36,32 @@ const Glacier: Glacier = async options => {
 			};
 			const res = response(httpRes, body);
 
+			const separatedPaths = ["/"].concat(
+				url.pathname
+					.split("/")
+					.filter(Boolean)
+					.map(path => "/" + path)
+			);
+
 			const { before, main, after } = routingTable[url.pathname];
+
+			for (let i = 0; i < separatedPaths.length; i++) {
+				const prev = routingTable[separatedPaths[i]];
+
+				if (prev?.before) await prev?.before(req, res);
+			}
 
 			if (before) await before(req, res);
 			await main(req, res);
 			if (after) await after(req, res);
-		} catch (err: unknown) {
-			httpRes.setHeader("Content-Type", "text/html");
 
-			if (err instanceof Error) {
-				if ("code" in err && err.code === "ERR_MODULE_NOT_FOUND") {
-					httpRes.statusCode = 404;
-					httpRes.end("<p>Not found.</p>");
-				} else {
-					httpRes.statusCode = 500;
-					httpRes.end("<p>Internal server error.</p>");
-				}
+			for (let i = 0; i < separatedPaths.length; i++) {
+				const prev = routingTable[separatedPaths[i]];
+
+				if (prev?.after) await prev?.after(req, res);
 			}
-
-			return;
+		} catch (err: unknown) {
+			httpRes.end(err?.toString());
 		}
 	}).listen(port, () => {
 		console.log(`❄️	Glacier.js live on port ${port}.`);
