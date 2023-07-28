@@ -61,7 +61,7 @@ const Glacier: Glacier = async options => {
 				if (prev?.after) await prev?.after(req, res);
 			}
 		} catch (err: unknown) {
-			httpRes.end(err?.toString());
+			httpRes.end(JSON.stringify(err?.toString()));
 		}
 	}).listen(port, () => {
 		console.log(`❄️	Glacier.js live on port ${port}.`);
