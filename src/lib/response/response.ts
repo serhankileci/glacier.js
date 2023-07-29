@@ -1,19 +1,14 @@
 import { ServerResponse } from "http";
 import { Response } from "../../types.js";
-import { render } from "./render.js";
 
-function response(httpResponse: ServerResponse, body: Record<string, unknown>): Response {
+function response(httpResponse: ServerResponse): Response {
 	return {
 		stdlib: httpResponse,
+		custom: {},
 		redirect: url => {
 			httpResponse.writeHead(302, { Location: url });
 			httpResponse.end();
 		},
-		custom: {},
-		download: () => {
-			// ...
-		},
-		render,
 		send: (data, options) => {
 			const { headers, status } = options || {};
 			// const mimetype = mime.lookup(filename);
