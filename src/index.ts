@@ -35,7 +35,7 @@ const Glacier: Glacier = async options => {
 			};
 			const res = response(httpRes);
 
-			await routeAndMiddlewareStack(pathname, routingTable, { req, res });
+			await routeAndMiddlewareStack(pathname, routingTable, [req, res]);
 		} catch (err: unknown) {
 			httpRes.end(JSON.stringify(err?.toString()));
 		}
