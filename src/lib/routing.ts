@@ -1,6 +1,6 @@
 import path from "node:path";
 import { readdir, stat } from "node:fs/promises";
-import { Request, Response, RouteHandler, RoutingTable } from "../types.js";
+import { RouteHandler, RoutingTable } from "../types.js";
 import { pathToFileURL } from "node:url";
 const { platform } = process;
 const locale = path[platform === "win32" ? "win32" : "posix"];
@@ -69,7 +69,6 @@ async function routeAndMiddlewareStack(
 	httpHandler: Parameters<RouteHandler>
 ) {
 	const { before, main, after } = routingTable[pathname] || {};
-
 	const [req, res] = httpHandler;
 	const pathnames = ["/"].concat(
 		pathname
