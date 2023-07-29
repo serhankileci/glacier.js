@@ -1,6 +1,6 @@
 import path from "node:path";
 import { readdir, stat } from "node:fs/promises";
-import { RoutingTable } from "../types.js";
+import { Request, Response, RouteHandler, RoutingTable } from "../types.js";
 import { pathToFileURL } from "node:url";
 const { platform } = process;
 const locale = path[platform === "win32" ? "win32" : "posix"];
@@ -53,23 +53,44 @@ async function buildRoutingTable(dir: string) {
 		}
 
 		if (!esModule.main) throw "Expected a 'main' HTTP handler function.";
+		if (!table[localePath]) table[localePath] = {} as RoutingTable[number];
 
-		if (!table[localePath]) {
-			table[localePath] = {} as RoutingTable[number];
-		}
-
-		if (esModule.before) {
-			table[localePath].before = esModule.before;
-		}
-
+		if (esModule.before) table[localePath].before = esModule.before;
 		table[localePath].main = esModule.main;
-
-		if (esModule.after) {
-			table[localePath].after = esModule.after;
-		}
+		if (esModule.after) table[localePath].after = esModule.after;
 	}
 
 	return table;
 }
 
-export { buildRoutingTable };
+async function routeAndMiddlewareStack(
+	pathname: string,
+	routingTable: RoutingTable,
+	httpHandler: Parameters<RouteHandler>
+) {
+	const { before, main, after } = routingTable[pathname] || {};
+
+	const [req, res] = httpHandler;
+	const pathnames = ["/"].concat(
+		pathname
+			.split("/")
+			.filter(Boolean)
+			.map(path => "/" + path)
+	);
+
+	for (let i = 0; i < pathnames.length; i++) {
+		const leadingRoute = routingTable[pathnames[i]];
+		if (leadingRoute?.before) await leadingRoute.before(req, res);
+	}
+
+	if (before) await before(req, res);
+	await main(req, res);
+	if (after) await after(req, res);
+
+	for (let i = pathnames.length - 1; i >= 0; i--) {
+		const leadingRoute = routingTable[pathnames[i]];
+		if (leadingRoute?.after) await leadingRoute.after(req, res);
+	}
+}
+
+export { buildRoutingTable, routeAndMiddlewareStack };
