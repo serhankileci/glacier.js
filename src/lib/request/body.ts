@@ -1,9 +1,14 @@
 import { IncomingMessage } from "http";
 import { XMLParser } from "fast-xml-parser";
+import { RequestMethod } from "../../types.js";
 const parser = new XMLParser();
 
-function parseRequestBody(httpReq: IncomingMessage): Promise<Record<string, string>> {
-	return new Promise((resolve, reject) => {
+function parseRequestBody(httpReq: IncomingMessage) {
+	return new Promise<Record<string, string>>((resolve, reject) => {
+		const method = httpReq.method?.toUpperCase() as RequestMethod;
+		const methodsWithRequestBody = ["POST", "PUT", "PATCH", "DELETE"];
+		if (!methodsWithRequestBody.includes(method)) resolve({});
+
 		let rawData = "";
 		let body = {};
 
