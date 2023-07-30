@@ -2,6 +2,8 @@ import http from "node:http";
 import { Glacier, Request, Response, RequestMethod } from "./types.js";
 import {
 	buildRoutingTable,
+	defaultResponses,
+	parseParams,
 	parseRequestBody,
 	response,
 	routeAndMiddlewareStack,
@@ -18,7 +20,6 @@ const Glacier: Glacier = async options => {
 	http.createServer(async (httpReq, httpRes) => {
 		try {
 			const method = httpReq.method?.toUpperCase() as RequestMethod;
-			const methodsWithRequestBody = ["POST", "PUT", "PATCH", "DELETE"];
 			const url = new URL(httpReq.url || "/", `http://${httpReq.headers.host}`);
 			const { pathname } = url;
 
@@ -29,21 +30,18 @@ const Glacier: Glacier = async options => {
 			}
 
 			const req: Request = {
-				stdlib: httpReq,
-				method,
-				body: methodsWithRequestBody.includes(method)
-					? await parseRequestBody(httpReq)
-					: {},
 				url,
+				method,
+				stdlib: httpReq,
 				query: Object.fromEntries(url.searchParams.entries()),
-				params: {},
+				params: parseParams(routingTable, pathname),
+				body: await parseRequestBody(httpReq),
 			};
 			const res = response(httpRes);
 
 			await routeAndMiddlewareStack(pathname, routingTable, [req, res]);
 		} catch (err: unknown) {
-			httpReq.statusCode = 500;
-			httpRes.end(JSON.stringify(err?.toString()));
+			defaultResponses.internalServerError(JSON.stringify(err), httpReq, httpRes);
 		}
 	}).listen(port, () => {
 		console.log(`❄️	Glacier.js live on port ${port}.`);
