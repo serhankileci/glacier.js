@@ -11,8 +11,6 @@ function response(httpResponse: ServerResponse): Response {
 		},
 		send: (data, options) => {
 			const { headers, status } = options || {};
-			// const mimetype = mime.lookup(filename);
-
 			if (status) httpResponse.statusCode = status;
 
 			for (const [key, value] of Object.entries(headers || {}))
