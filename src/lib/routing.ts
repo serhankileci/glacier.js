@@ -2,6 +2,7 @@ import path from "node:path";
 import { readdir, stat } from "node:fs/promises";
 import { RouteHandler, RoutingTable } from "../types.js";
 import { pathToFileURL } from "node:url";
+import { defaultResponses } from "./response/defaultResponses.js";
 const { platform } = process;
 const locale = path[platform === "win32" ? "win32" : "posix"];
 
@@ -60,7 +61,44 @@ async function buildRoutingTable(dir: string) {
 		if (esModule.after) table[localePath].after = esModule.after;
 	}
 
+	table["*"] = {
+		main: defaultResponses.notFound,
+	};
+
 	return table;
+}
+
+function parseParams(routingTable: RoutingTable, pathname: string) {
+	const params: Record<string, string> = {};
+
+	for (const staticRoute in routingTable) {
+		const staticParts = staticRoute.split("/").filter(Boolean);
+		const dynamicParts = pathname.split("/").filter(Boolean);
+		let isMatch = true;
+
+		if (staticParts.length !== dynamicParts.length) continue;
+
+		for (let i = 0; i < staticParts.length; i++) {
+			const staticPart = staticParts[i];
+			const dynamicPart = dynamicParts[i];
+
+			if (staticPart === dynamicPart) continue;
+
+			if (staticPart.startsWith("[") && staticPart.endsWith("]")) {
+				const paramName = staticPart.replace(/[[\]]/g, "");
+				params[paramName] = dynamicPart;
+			} else {
+				isMatch = false;
+				break;
+			}
+		}
+
+		if (isMatch) {
+			return params;
+		}
+	}
+
+	return params;
 }
 
 async function routeAndMiddlewareStack(
@@ -68,8 +106,21 @@ async function routeAndMiddlewareStack(
 	routingTable: RoutingTable,
 	httpHandler: Parameters<RouteHandler>
 ) {
-	const { before, main, after } = routingTable[pathname] || {};
 	const [req, res] = httpHandler;
+
+	if (req.params) {
+		for (const [key, value] of Object.entries(req.params)) {
+			pathname = pathname.replace(value, `[${key}]`);
+		}
+	}
+
+	const { before, main, after } = routingTable[pathname] || {};
+
+	if (!routingTable[pathname]) {
+		routingTable["*"].main(req, res);
+		return;
+	}
+
 	const pathnames = ["/"].concat(
 		pathname
 			.split("/")
@@ -92,4 +143,4 @@ async function routeAndMiddlewareStack(
 	}
 }
 
-export { buildRoutingTable, routeAndMiddlewareStack };
+export { buildRoutingTable, routeAndMiddlewareStack, parseParams };
