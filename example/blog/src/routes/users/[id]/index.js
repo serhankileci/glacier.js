@@ -1,5 +1,6 @@
 function main(req, res) {
-	res.send("/users/[id]");
+	const id = req.params.id;
+	res.send(`/users/${id}`);
 }
 
 export { main };
