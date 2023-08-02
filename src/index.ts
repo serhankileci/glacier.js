@@ -20,11 +20,14 @@ const Glacier: Glacier = async options => {
 	http.createServer(async (httpReq, httpRes) => {
 		try {
 			const method = httpReq.method?.toUpperCase() as RequestMethod;
-			if (httpReq.url?.endsWith("/")) {
-				httpReq.url = httpReq.url.slice(0, -1);
-			}
 			const url = new URL(httpReq.url || "/", `http://${httpReq.headers.host}`);
 			const { pathname } = url;
+
+			if (/\/+$/.test(url.pathname)) {
+				httpRes.writeHead(302, { Location: url.pathname.replace(/\/+$/, "") });
+				httpRes.end();
+				return;
+			}
 
 			if (pathname === "/favicon.ico") {
 				httpRes.statusCode = 404;
