@@ -20,7 +20,6 @@ const Glacier: Glacier = async options => {
 	http.createServer(async (httpReq, httpRes) => {
 		try {
 			const method = httpReq.method?.toUpperCase() as RequestMethod;
-			// Truncate trailing slash if it exists within `httpReq.url`.
 			if (httpReq.url?.endsWith("/")) {
 				httpReq.url = httpReq.url.slice(0, -1);
 			}
