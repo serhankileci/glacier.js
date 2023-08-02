@@ -23,6 +23,12 @@ const Glacier: Glacier = async options => {
 			const url = new URL(httpReq.url || "/", `http://${httpReq.headers.host}`);
 			const { pathname } = url;
 
+			if (/\/+$/.test(url.pathname)) {
+				httpRes.writeHead(302, { Location: url.pathname.replace(/\/+$/, "") });
+				httpRes.end();
+				return;
+			}
+
 			if (pathname === "/favicon.ico") {
 				httpRes.statusCode = 404;
 				httpRes.end(404);
