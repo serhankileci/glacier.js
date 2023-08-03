@@ -8,6 +8,7 @@ import {
 	response,
 	routeAndMiddlewareStack,
 } from "./lib/index.js";
+import { normalizePathname } from "./lib/util.js";
 
 const Glacier: Glacier = async options => {
 	console.log("❄️	Glacier.js is starting...");
@@ -19,15 +20,19 @@ const Glacier: Glacier = async options => {
 
 	http.createServer(async (httpReq, httpRes) => {
 		try {
-			const method = httpReq.method?.toUpperCase() as RequestMethod;
-			const url = new URL(httpReq.url || "/", `http://${httpReq.headers.host}`);
-			const { pathname } = url;
+			const normalizedPathname = normalizePathname(httpReq.url);
 
-			if (/\/+$/.test(url.pathname)) {
-				httpRes.writeHead(302, { Location: url.pathname.replace(/\/+$/, "") });
+			if (normalizedPathname !== httpReq.url) {
+				httpRes.writeHead(302, {
+					Location: normalizedPathname,
+				});
 				httpRes.end();
 				return;
 			}
+
+			const method = httpReq.method?.toUpperCase() as RequestMethod;
+			const url = new URL(httpReq.url || "/", `http://${httpReq.headers.host}`);
+			const { pathname } = url;
 
 			if (pathname === "/favicon.ico") {
 				httpRes.statusCode = 404;
