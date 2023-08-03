@@ -35,7 +35,8 @@
 		"format": "prettier --check src/**/*.ts || prettier --write src/**/*.ts",
 		"test": "jest",
 		"ts": "tsc -p .",
-		"build": "cross-env npm run lint && npm run format && npm run ts"
+		"build": "cross-env npm run lint && npm run format && npm run ts",
+		"example": "npm run ts && cd ./example/blog && npm ln ../.. && npm run dev"
 	},
 	"dependencies": {
 		"fast-xml-parser": "^4.2.6",
