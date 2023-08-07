@@ -6,29 +6,33 @@ import { defaultResponses } from "./response/defaultResponses.js";
 const { platform } = process;
 const locale = path[platform === "win32" ? "win32" : "posix"];
 
+interface FStat {
+	fullPath: string;
+	isJsFile: boolean;
+	isDirectory: boolean;
+}
+
+async function fStat(fp: string): Promise<FStat> {
+	const fileStat = await stat(fp);
+	return {
+		fullPath: fp,
+		isJsFile: path.extname(fp) === ".js",
+		isDirectory: fileStat.isDirectory(),
+	};
+}
+
 async function traverseDir(dir: string): Promise<string[]> {
 	const files = await readdir(dir);
-	const stats = await Promise.all(
-		files.map(async file => {
-			const fullPath = path.join(dir, file);
+	const promises = files.map(file => fStat(path.join(dir, file)));
 
-			return {
-				fullPath,
-				isJsFile: path.extname(file) === ".js",
-				isDirectory: (await stat(fullPath)).isDirectory(),
-			};
-		})
-	);
+	const stats = await Promise.all(promises);
 
 	const dirs = [];
 	const routeFiles = [];
 
 	for (const { fullPath, isJsFile, isDirectory } of stats) {
-		if (isDirectory) {
-			dirs.push(fullPath);
-		} else if (isJsFile) {
-			routeFiles.push(fullPath);
-		}
+		if (isDirectory) dirs.push(fullPath);
+		else if (isJsFile) routeFiles.push(fullPath);
 	}
 
 	const subDirs = await Promise.all(dirs.map(traverseDir));
