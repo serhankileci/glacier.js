@@ -17,12 +17,12 @@ function bodyParser(httpReq: IncomingMessage) {
 		httpReq.on("end", () => {
 			const contentType = httpReq.headers["content-type"];
 			const isJSON = contentType?.includes("application/json");
-			const isFormData = contentType?.includes("application/x-www-form-urlencoded");
+			const isUrlEncodedFormData = contentType?.includes("application/x-www-form-urlencoded");
 			const isXML = contentType?.includes("application/xml");
 
 			if (isJSON) {
 				body = JSON.parse(rawData);
-			} else if (isFormData) {
+			} else if (isUrlEncodedFormData) {
 				const result: Record<string, string> = {};
 				const obj = rawData.split("&");
 
