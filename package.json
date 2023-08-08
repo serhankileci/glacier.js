@@ -1,6 +1,6 @@
 {
 	"name": "glacier.js",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"homepage": "https://github.com/serhankileci/glacier.js",
 	"repository": {
 		"type": "git",
@@ -37,7 +37,7 @@
 		"test": "vitest --run --coverage",
 		"dev:test": "vitest --coverage",
 		"dev:package": "nodemon --watch src --ext 'ts' --exec 'tsc -p .'",
-		"build": "cross-env npm run format && npm run lint && tsc -p . && npm test"
+		"build": "cross-env npm run format && npm run lint && rimraf build && tsc -p . && npm test"
 	},
 	"dependencies": {
 		"fast-xml-parser": "^4.2.6",
@@ -55,6 +55,7 @@
 		"prettier": "^2.8.4",
 		"ts-node": "^10.9.1",
 		"nodemon": "^3.0.1",
-		"typescript": "^5.1.6"
+		"typescript": "^5.1.6",
+		"rimraf": "^5.0.1"
 	}
 }
