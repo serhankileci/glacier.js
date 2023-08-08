@@ -1,6 +1,6 @@
 {
 	"name": "glacier.js",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"homepage": "https://github.com/serhankileci/glacier.js",
 	"repository": {
 		"type": "git",
@@ -31,27 +31,30 @@
 		"doc": "docs"
 	},
 	"scripts": {
-		"lint": "eslint . --ext .js,.ts",
-		"format": "prettier --check src/**/*.ts || prettier --write src/**/*.ts",
-		"test": "jest",
-		"ts": "tsc -p .",
-		"build": "cross-env npm run lint && npm run format && npm run ts"
+		"prepare": "husky install",
+		"lint": "cross-env eslint . --ext .js,.ts",
+		"format": "cross-env prettier --check src/**/*.ts || prettier --write src/**/*.ts",
+		"test": "vitest --run --coverage",
+		"dev:test": "vitest --coverage",
+		"dev:package": "nodemon --watch src --ext 'ts' --exec 'tsc -p .'",
+		"build": "cross-env npm run format && npm run lint && tsc -p . && npm test"
 	},
 	"dependencies": {
 		"fast-xml-parser": "^4.2.6",
 		"utility-types": "^3.10.0"
 	},
 	"devDependencies": {
-		"@types/jest": "^29.5.2",
 		"@types/node": "^18.13.0",
 		"@typescript-eslint/eslint-plugin": "^5.51.0",
 		"@typescript-eslint/parser": "^5.51.0",
 		"cross-env": "^7.0.3",
 		"eslint": "^8.33.0",
-		"jest": "^29.5.0",
+		"vitest": "^0.34.1",
+		"@vitest/coverage-istanbul": "^0.34.1",
+		"husky": "^8.0.3",
 		"prettier": "^2.8.4",
-		"ts-jest": "^29.1.0",
 		"ts-node": "^10.9.1",
+		"nodemon": "^3.0.1",
 		"typescript": "^5.1.6"
 	}
 }
