@@ -1,51 +1,15 @@
 # ❄️ Glacier.js
-Opinionated web framework for Node.js in TypeScript for quickly building stable and hierarchical backends.
+Opinionated and batteries-included web framework for Node.js in TypeScript, for quickly building stable and hierarchical backends.
 
-<table>
-<tr>
-	<th>Routes Directory</th>
-	<th>Generated Routes</th>
-</tr>
-<tr>
-<td>
+## Scope and Aims
+Glacier.js' philosophy is clarity, organization, and ease of use.
 
-```
-routes
-├── index.ts             
-├── about.ts  
-├── foo
-│   ├── index.ts
-│   └── bar
-│       └── index.ts
-└── users
-    ├── index.ts
-    ├── [id]
-    │   ├── info.ts
-    │   └── posts.ts
-    └── baz
-        ├── index.ts
-        └── about.ts
-```
-</td>
-<td>
+## Features
+- Filesystem routing<!--https://github.com/serhankileci/glacier.js/docs/filesystem-routing.md-->
+- Request/response handling<!--(./docs/request-response-handling.md)-->
+- Standard library of middlewares<!--(./docs/middlewares.md#stdlib)-->
 
-```
+## Glossary
+- [CHANGELOG](./CHANGELOG.md)
+- [CONTRIBUTING](./CONTRIBUTING.md)
 
-⟹  /
-⟹  /about
-
-⟹  /foo
-
-⟹  /foo/bar   
-
-⟹  /users
-
-⟹  /users/:id/info
-⟹  /users/:id/posts
-
-⟹  /users/baz
-⟹  /users/baz/about
-```
-</td>
-</tr>
-</table>
