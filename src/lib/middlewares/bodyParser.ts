@@ -7,7 +7,7 @@ function bodyParser(httpReq: IncomingMessage) {
 	return new Promise<Record<string, string>>((resolve, reject) => {
 		const method = httpReq.method?.toUpperCase() as RequestMethod;
 		const methodsWithRequestBody = ["POST", "PUT", "PATCH", "DELETE"];
-		if (!methodsWithRequestBody.includes(method)) resolve({});
+		if (!methodsWithRequestBody.includes(method)) return resolve({});
 
 		let rawData = "";
 		let body = {};
@@ -36,7 +36,7 @@ function bodyParser(httpReq: IncomingMessage) {
 				body = parser.parse(rawData);
 			}
 
-			resolve(body);
+			return resolve(body);
 		});
 	});
 }
