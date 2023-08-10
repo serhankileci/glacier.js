@@ -8,6 +8,7 @@ const locale = path[platform === "win32" ? "win32" : "posix"];
 
 async function fStat(fp: string): Promise<FStat> {
 	const fileStat = await stat(fp);
+
 	return {
 		fullPath: fp,
 		isJsFile: path.extname(fp) === ".js",
@@ -37,21 +38,38 @@ async function buildRoutingTable(dir: string) {
 	try {
 		const table: RoutingTable = {};
 		const routeFiles = await traverseDir(dir);
+		const dirsWithMultiDynamicRoutes: Record<string, string[]> = {};
 
 		for (const filePath of routeFiles) {
-			let localePath = filePath.split(path.sep).join(locale.sep);
+			let localePath = filePath.replace(path.sep, locale.sep);
 			const esModule: Partial<RoutingTable[number]> = await import(
 				pathToFileURL(localePath).toString()
 			);
 
+			// normalizing path
 			localePath = localePath
 				.replace(".js", "")
 				.replace("index", "")
 				.replaceAll("\\", "/")
+				.replace(/\s+/, "-")
 				.replace(dir, "");
 
+			// checking dir for multiple dynamic routes
+			const parts = localePath.split("/");
+			const folder = parts.slice(0, -1).join("/");
+			const file = parts.slice(-1)[0];
+
+			if (file.startsWith("[") && file.endsWith("]")) {
+				if (!dirsWithMultiDynamicRoutes[folder]) {
+					dirsWithMultiDynamicRoutes[folder] = [];
+				}
+
+				dirsWithMultiDynamicRoutes[folder].push(file);
+			}
+
+			// handling trailing slash
 			if (localePath !== "/" && localePath.endsWith("/")) {
-				localePath = localePath.slice(0, localePath.length - 1);
+				localePath = localePath.slice(0, -1);
 			}
 
 			if (!esModule.handler) throw new Error("Expected a main 'handler' function.");
@@ -60,6 +78,21 @@ async function buildRoutingTable(dir: string) {
 			if (esModule.before) table[localePath].before = esModule.before;
 			table[localePath].handler = esModule.handler;
 			if (esModule.after) table[localePath].after = esModule.after;
+		}
+
+		const filteredmultiDynamicDirs = Object.entries(dirsWithMultiDynamicRoutes).filter(
+			([_, val]) => val.length > 1
+		);
+		const plural = filteredmultiDynamicDirs.length === 1 ? "y" : "ies";
+
+		if (filteredmultiDynamicDirs.length > 0) {
+			throw new Error(
+				`
+				Found multiple dynamic route files in director${plural}:\n
+				${filteredmultiDynamicDirs.map(([dp, fp]) => `${dp}\n- ${fp.join("\n- ")}`).join("\n\n")}\n
+				Make sure each folder only has one dynamic route.
+				`.replace(/\t+/g, "")
+			);
 		}
 
 		table["*"] = {
