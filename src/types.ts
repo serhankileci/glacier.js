@@ -69,6 +69,10 @@ interface GlacierResponse {
 }
 
 // misc.
+type DefaultResponses = {
+	notFound: RouteHandler;
+	internalServerError: (err: unknown, httpReq: IncomingMessage, httpRes: ServerResponse) => void;
+};
 type TextData = string | number | boolean | null;
 type JsonData = string | number | boolean | null | { [key: string]: JsonData } | JsonData[];
 interface FStat {
@@ -88,4 +92,5 @@ export {
 	ContentType,
 	RouteHandler,
 	FStat,
+	DefaultResponses,
 };
