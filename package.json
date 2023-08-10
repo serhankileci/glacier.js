@@ -34,10 +34,10 @@
 		"prepare": "husky install",
 		"lint": "cross-env eslint . --ext .js,.ts",
 		"format": "cross-env prettier --check src/**/*.ts || prettier --write src/**/*.ts",
-		"test": "vitest --run --coverage",
 		"dev:test": "vitest --coverage",
 		"dev:package": "nodemon --watch src --ext 'ts' --exec 'tsc -p .'",
-		"build": "cross-env npm run format && npm run lint && rimraf build && tsc -p . && npm test"
+		"test": "vitest --run --coverage",
+		"build": "cross-env npm run format && npm run lint && rimraf build && tsc -p ."
 	},
 	"dependencies": {
 		"fast-xml-parser": "^4.2.6",
