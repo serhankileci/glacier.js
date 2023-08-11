@@ -1,7 +1,7 @@
 import { IncomingMessage } from "http";
 import { XMLParser } from "fast-xml-parser";
 import { RequestMethod } from "../../types.js";
-const parser = new XMLParser();
+const parser = new XMLParser({ ignoreAttributes: false });
 
 function bodyParser(httpReq: IncomingMessage) {
 	return new Promise<Record<string, string>>((resolve, reject) => {
