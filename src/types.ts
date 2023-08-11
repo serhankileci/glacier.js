@@ -65,6 +65,7 @@ interface GlacierResponse {
 	custom?: Record<string, unknown>;
 	readonly html: (data: string, options?: ResponseMethodOptions) => void;
 	readonly text: (data: TextData, options?: ResponseMethodOptions) => void;
+	readonly xml: (data: string, options?: ResponseMethodOptions) => void;
 	readonly json: (data: JsonData, options?: ResponseMethodOptions) => void;
 	readonly redirect: (url: string) => void;
 	readonly util: {
