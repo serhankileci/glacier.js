@@ -21,6 +21,6 @@ const requestMethods = [
 	"TRACE",
 	"CONNECT",
 ] as const;
-const contentTypes = ["application/json", "text/plain", "text/html"] as const;
+const contentTypes = ["application/json", "text/plain", "text/html", "application/xml"] as const;
 
 export { normalizePathname, requestMethods, contentTypes };
