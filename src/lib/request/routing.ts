@@ -47,12 +47,7 @@ async function buildRoutingTable(dir: string) {
 			);
 
 			// normalizing path
-			localePath = localePath
-				.replace(".js", "")
-				.replace("index", "")
-				.replaceAll("\\", "/")
-				.replace(/\s+/, "-")
-				.replace(dir, "");
+			localePath = localePath.replace(".js", "").replace("index", "").replace(dir, "");
 
 			// checking dir for multiple dynamic routes
 			const parts = localePath.split("/");
@@ -118,6 +113,8 @@ async function handleResponseAndMiddlewares(
 			pathname = pathname.replace(value, `[${key}]`);
 		}
 	}
+
+	pathname = decodeURIComponent(pathname);
 
 	if (!routingTable[pathname]) {
 		routingTable["*"].handler(req, res);
