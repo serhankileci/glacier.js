@@ -13,6 +13,7 @@ async function request(
 	return {
 		url,
 		method,
+		headers: httpReq.headers,
 		stdlib: httpReq,
 		query: Object.fromEntries(url.searchParams.entries()),
 		cookies: cookieParser(httpReq.headers),
