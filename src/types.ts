@@ -48,7 +48,8 @@ interface GlacierRequest {
 	readonly method: RequestMethod;
 	readonly url: URL;
 	readonly body: Record<string, string>;
-	readonly cookies: IncomingHttpHeaders;
+	readonly headers: IncomingHttpHeaders;
+	readonly cookies: Record<string, string> | undefined;
 	readonly query: Record<string, string>;
 	readonly params: Record<string, string>;
 }
@@ -62,11 +63,16 @@ interface GlacierResponse {
 	 * custom object to store values in
 	 */
 	custom?: Record<string, unknown>;
-	readonly html: (data: string, options?: SharedSendArgs<"content-type">) => void;
-	readonly text: (data: TextData, options?: SharedSendArgs<"content-type">) => void;
-	readonly json: (data: JsonData, options?: SharedSendArgs<"content-type">) => void;
+	readonly html: (data: string, options?: ResponseMethodOptions) => void;
+	readonly text: (data: TextData, options?: ResponseMethodOptions) => void;
+	readonly json: (data: JsonData, options?: ResponseMethodOptions) => void;
 	readonly redirect: (url: string) => void;
+	readonly util: {
+		readonly setCookie: (key: string, value: string) => void;
+	};
 }
+
+type ResponseMethodOptions = SharedSendArgs<"content-type">;
 
 // misc.
 type DefaultResponses = {
@@ -93,4 +99,5 @@ export {
 	RouteHandler,
 	FStat,
 	DefaultResponses,
+	ResponseMethodOptions,
 };
